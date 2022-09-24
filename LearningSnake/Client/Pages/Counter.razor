@@ -1,0 +1,151 @@
+﻿@page "/counter"
+@using LearningSnake.NeuralNetwork
+@using LearningSnake.SnakeGame.Game
+@using LearningSnake.SnakeGame.GeneticAlgorithm
+
+<PageTitle>Counter</PageTitle>
+<div @ref="testRef" tabindex="0" @onkeydown="HandleKeyDown" class="game-board">
+    @for (int y = 0; y < snakeGame.BoardSize.Y; y++)
+    {
+        @for (int x = 0; x < snakeGame.BoardSize.X; x++)
+        {
+            @if (snakeGame.Apple.X == x && snakeGame.Apple.Y == y)
+            {
+                <div class="cell apple"></div>
+            }
+            else if (snakeGame.SnakeBody.Last().X == x && snakeGame.SnakeBody.Last().Y == y)
+            {
+                <div class="cell snake-head"></div>
+            }
+            else if (snakeGame.SnakeBody.Any(z => z.X == x && z.Y == y))
+            {
+                <div class="cell snake-body"></div>
+            }
+            else
+            {
+                <div class="cell grid-cell"></div>
+            }
+        }
+    }
+</div>
+
+@code {
+    private int currentCount = 0;
+    private System.Timers.Timer _timer;
+    private GameOfSnake snakeGame = new GameOfSnake(10, 10, 3, Guid.NewGuid().GetHashCode());
+    private Direction direction = Direction.Down;
+    private ElementReference testRef;
+    private GameSimulator gameSimulator;
+    private NeuralNetwork bestSnake;
+    private Population population;
+    private NeuralNetworkConfiguration neuralNetworkConfiguration = new NeuralNetworkConfiguration
+        {
+            HiddenLayersActivacionFunction = ActivactionFunction.Relu,
+            OutputLayerActivactionFunction = ActivactionFunction.Sigmoid,
+            HiddenNeuronLayers = 2,
+            NeuronsPerHiddenLayer = 16,
+            InputNodes = 24,
+            OutputNodes = 4
+        };
+
+    GeneticAlgorithmConfiguration geneticAlgorithmConfiguration = new GeneticAlgorithmConfiguration
+        {
+            PopulationSize = 1000,
+            MutationRate = 0.01,
+            ParentPercentage = 0.05,
+            PreservedParents = 0.5
+        };
+
+    GameConfiguration gameConfiguration = new GameConfiguration
+        {
+            BoardHeight = 10,
+            BoardWidth = 10,
+            SnakeStartingMoves = 100,
+            SnakeMovesGainedAfterEatingFood = 100,
+            SnakeMaxMoves = 500,
+            StartingSnakeLength = 5,
+            SnakeLenghtAdditionAfterEatingFood = 1,
+            BinaryVision = false
+        };
+    protected override Task OnInitializedAsync()
+    {
+        snakeGame.InitializeGame();
+
+
+        
+        population = new Population();
+        population.GenerateInitialPopulation(neuralNetworkConfiguration, geneticAlgorithmConfiguration.PopulationSize);
+        gameSimulator = new GameSimulator(population);
+
+        var seed = Guid.NewGuid().GetHashCode();
+        gameSimulator.SimulateGameForEntirePopulation(seed, gameConfiguration, false);
+        bestSnake = population.GetBestSnake();
+
+
+        _timer = new System.Timers.Timer();
+        _timer.Interval = 100;
+        _timer.Elapsed += MakeAMove;
+        _timer.AutoReset = true;
+        _timer.Enabled = true;
+
+        return base.OnInitializedAsync();
+    }
+
+    public void MakeAMove(Object? source, System.Timers.ElapsedEventArgs e)
+    {
+        if(snakeGame.State == GameState.InProgress){
+            gameSimulator.MakeAMove(snakeGame, bestSnake);
+        }
+        else{
+            var seed = Guid.NewGuid().GetHashCode();
+
+
+            snakeGame = new GameOfSnake(10, 10, 3, seed);
+            snakeGame.InitializeGame();
+
+            _timer.Stop();
+            population.CreateNewGenerationFromPreviousOne(geneticAlgorithmConfiguration);
+            gameSimulator = new GameSimulator(population);
+
+            gameSimulator.SimulateGameForEntirePopulation(seed, gameConfiguration, false);
+            bestSnake = population.GetBestSnake();
+
+            _timer = new System.Timers.Timer();
+            _timer.Interval = 100;
+            _timer.Elapsed += MakeAMove;
+            _timer.AutoReset = true;
+            _timer.Enabled = true;
+        }
+
+        //snakeGame.MakeMove(direction);
+        this.StateHasChanged();
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        switch (e.Code)
+        {
+            case "ArrowLeft": // Left
+                direction = Direction.Left;
+                break;
+            case "ArrowUp": // Up
+                direction = Direction.Up;
+                break;
+            case "ArrowRight": // Right
+                direction = Direction.Right;
+                break;
+            case "ArrowDown": // Down
+                direction = Direction.Down;
+                break;
+            default:
+                break;
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await testRef.FocusAsync();
+        }
+    }
+}

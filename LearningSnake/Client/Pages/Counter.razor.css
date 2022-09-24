@@ -1,0 +1,29 @@
+﻿.game-board {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    width: 200px;
+    height: 200px;
+}
+
+.cell {
+    width: 20px;
+    height: 20px;
+}
+
+.snake-body {
+    background: green;
+}
+
+.snake-head {
+    background: darkgreen;
+}
+
+.grid-cell {
+    background: grey;
+}
+
+.apple {
+    background: red;
+}
