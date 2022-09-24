@@ -1,0 +1,87 @@
+﻿@page "/manual-snake-game"
+
+<PageTitle>Manual snake game</PageTitle>
+<div @ref="testRef" tabindex="0" @onkeydown="HandleKeyDown">
+    <GameBoard SnakeGame="_snakeGame" />
+</div>
+
+@code {
+    private System.Timers.Timer? _timer;
+    private SnakeGame? _snakeGame;
+    private Direction direction = Direction.Down;
+    private ElementReference testRef;
+
+    GameConfiguration gameConfiguration = new GameConfiguration
+        {
+            BoardHeight = 10,
+            BoardWidth = 10,
+            SnakeStartingMoves = 100,
+            SnakeMovesGainedAfterEatingFood = 100,
+            SnakeMaxMoves = 500,
+            StartingSnakeLength = 5,
+            SnakeLenghtAdditionAfterEatingFood = 1,
+            BinaryVision = false
+        };
+
+    protected override Task OnInitializedAsync()
+    {
+        _timer = new System.Timers.Timer();
+        _timer.Interval = 100;
+        _timer.Elapsed += MakeAMove;
+        _timer.AutoReset = true;
+        _timer.Enabled = true;
+
+        return base.OnInitializedAsync();
+    }
+
+    public void MakeAMove(Object? source, System.Timers.ElapsedEventArgs e)
+    {
+        if (_snakeGame != null && _snakeGame.State == GameState.InProgress)
+        {
+            _snakeGame.MakeMove(direction);
+        }
+        else
+        {
+            StartNewGame();
+        }
+
+        this.StateHasChanged();
+    }
+
+    private void StartNewGame()
+    {
+        var seed = Guid.NewGuid().GetHashCode();
+
+        _snakeGame = new SnakeGame(gameConfiguration.BoardHeight, gameConfiguration.BoardWidth, gameConfiguration.StartingSnakeLength, seed);
+        _snakeGame.InitializeGame();
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        switch (e.Code)
+        {
+            case "ArrowLeft":
+                direction = Direction.Left;
+                break;
+            case "ArrowUp":
+                direction = Direction.Up;
+                break;
+            case "ArrowRight":
+                direction = Direction.Right;
+                break;
+            case "ArrowDown":
+                direction = Direction.Down;
+                break;
+            default:
+                break;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await testRef.FocusAsync();
+        }
+    }
+}

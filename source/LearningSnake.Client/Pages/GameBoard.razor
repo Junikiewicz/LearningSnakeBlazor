@@ -1,0 +1,34 @@
+﻿@using LearningSnake.GameOfSnake;
+
+@if (SnakeGame != null)
+{
+    <div class="game-board">
+        @for (int y = 0; y < SnakeGame.BoardSize.Y; y++)
+        {
+            @for (int x = 0; x < SnakeGame.BoardSize.X; x++)
+            {
+                @if (SnakeGame.Apple.X == x && SnakeGame.Apple.Y == y)
+                {
+                    <div class="cell apple"></div>
+                }
+                else if (SnakeGame.SnakeBody.Last().X == x && SnakeGame.SnakeBody.Last().Y == y)
+                {
+                    <div class="cell snake-head"></div>
+                }
+                else if (SnakeGame.SnakeBody.Any(z => z.X == x && z.Y == y))
+                {
+                    <div class="cell snake-body"></div>
+                }
+                else
+                {
+                    <div class="cell grid-cell"></div>
+                }
+            }
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public SnakeGame? SnakeGame { get; set; }
+}
