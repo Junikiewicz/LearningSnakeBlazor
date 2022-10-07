@@ -31,7 +31,7 @@ jobs:
         context: ./source/
         file: ./source/LearningSnake.Server/Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/learningSnake:latest
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/learning_snake:latest
 
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
