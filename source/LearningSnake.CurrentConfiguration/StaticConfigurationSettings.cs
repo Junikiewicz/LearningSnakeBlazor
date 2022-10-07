@@ -18,7 +18,7 @@ namespace LearningSnake.CurrentConfiguration
 
         public static GeneticAlgorithmConfiguration GeneticAlgorithmConfiguration = new GeneticAlgorithmConfiguration
         {
-            PopulationSize = 100,
+            PopulationSize = 1000,
             MutationRate = 0.01,
             ParentPercentage = 0.05,
             PreservedParents = 0.5
