@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LearningSnake.Client\LearningSnake.Client.csproj" />
+    <ProjectReference Include="..\LearningSnake.DTO\LearningSnake.DTO.csproj" />
   </ItemGroup>
 
 

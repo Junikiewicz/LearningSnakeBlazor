@@ -1,0 +1,81 @@
+﻿@page "/neural-network-snake-game-server";
+@using LearningSnake.CurrentConfiguration
+@using LearningSnake.DTO
+@using System.Text.Json
+@inject HttpClient httpClient;
+
+<PageTitle>Neural network game - server</PageTitle>
+All the calulations are done on the server. In this window you only see results. There is only one population for all application users. Generation number: @_populationIndex
+<GameBoard SnakeGame="_snakeGame" />
+<div>
+    <button type="button" class="btn btn-success mt-2" @onclick="@MoveToTheLatestPopulation">Show latest generation</button>
+
+</div>
+<div>
+    <button type="button" class="btn btn-danger mt-2" @onclick="@ResetPopulation">Kill entire population and start from beginning</button>
+</div>
+
+@code {
+    private System.Timers.Timer _timer = new System.Timers.Timer(100);
+    private SnakeGame? _snakeGame;
+    private SnakeSpecimen? _bestSnake;
+    private SnakeSpecimenFactory _snakeFactory = new SnakeSpecimenFactory(StaticConfigurationSettings.NeuralNetworkConfiguration);
+    private long _populationIndex = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCurrentBestSnake();
+
+        _timer.Elapsed += MakeAMove;
+        _timer.AutoReset = true;
+        _timer.Enabled = true;
+
+        await base.OnInitializedAsync();
+    }
+
+    private async void MakeAMove(Object? source, System.Timers.ElapsedEventArgs e)
+    {
+        if (_snakeGame != null && _bestSnake != null && _snakeGame.State == GameState.InProgress)
+        {
+            GameSimulator.MakeMove(_snakeGame, _bestSnake);
+        }
+        else
+        {
+            await MoveToTheLatestPopulation();
+        }
+
+        this.StateHasChanged();
+    }
+
+    private async Task LoadCurrentBestSnake()
+    {
+        var currentBestSnakeResponse = await httpClient.GetAsync("/SnakeGame");
+        if (currentBestSnakeResponse.IsSuccessStatusCode)
+        {
+            var responseStream = await currentBestSnakeResponse.Content.ReadAsStreamAsync();
+            var bestSnakeFromServer = await JsonSerializer.DeserializeAsync<BestSnakeGame>(responseStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (bestSnakeFromServer != null && bestSnakeFromServer.Genotype != null)
+            {
+                _snakeGame = new SnakeGame(StaticConfigurationSettings.GameConfiguration, bestSnakeFromServer.Seed);
+                _snakeGame.InitializeGame();
+                _bestSnake = (SnakeSpecimen)_snakeFactory.CreateSpecimen(bestSnakeFromServer.Genotype);
+                _populationIndex = bestSnakeFromServer.PopulationIndex;
+            }
+        }
+    }
+
+    private async Task ResetPopulation()
+    {
+        _timer!.Stop();
+        await httpClient.DeleteAsync("/SnakeGame");
+        await LoadCurrentBestSnake();
+        _timer.Start();
+    }
+
+    private async Task MoveToTheLatestPopulation()
+    {
+        _timer!.Stop();
+        await LoadCurrentBestSnake();
+        _timer.Start();
+    }
+}

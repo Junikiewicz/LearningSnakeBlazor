@@ -16,7 +16,7 @@ namespace LearningSnake.LearningSnakeManager
 
         public ISpecimen CreateSpecimen(IEnumerable<double> genotype)
         {
-            var neuralNetwork = new NeuralNetwork.Network(_configuration);
+            var neuralNetwork = new Network(_configuration);
             neuralNetwork.LoadValuesFromArray(genotype.ToArray());
 
             return new SnakeSpecimen(neuralNetwork);
@@ -24,7 +24,7 @@ namespace LearningSnake.LearningSnakeManager
 
         public ISpecimen CreateSpecimen()
         {
-            var neuralNetwork = new NeuralNetwork.Network(_configuration);
+            var neuralNetwork = new Network(_configuration);
             neuralNetwork.Randomize();
 
             return new SnakeSpecimen(neuralNetwork);

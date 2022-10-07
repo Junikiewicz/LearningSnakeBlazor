@@ -39,6 +39,8 @@ namespace LearningSnake.Server
             app.MapControllers();
             app.MapFallbackToFile("index.html");
 
+            SnakeGameSingleton.RunSimulationJob();
+
             app.Run();
         }
     }

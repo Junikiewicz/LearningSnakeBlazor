@@ -27,7 +27,7 @@ namespace LearningSnake.LearningSnakeManager
         {
             foreach (var snake in _population.Population.Select(x => (SnakeSpecimen)x))
             {
-                var game = new SnakeGame(_gameConfiguration.BoardHeight, _gameConfiguration.BoardWidth, _gameConfiguration.StartingSnakeLength, seed);
+                var game = new SnakeGame(_gameConfiguration, seed);
                 game.InitializeGame();
                 do
                 {
@@ -38,7 +38,12 @@ namespace LearningSnake.LearningSnakeManager
             }
         }
 
-        public void MakeMove(SnakeGame game, SnakeSpecimen specimen)
+        public void CreateNewGenerationFromPreviousOne()
+        {
+            _population.CreateNewGenerationFromPreviousOne();
+        }
+
+        public static void MakeMove(SnakeGame game, SnakeSpecimen specimen)
         {
             var vision = game.GetSnakeVision();
             var direction = specimen.DecideMove(vision);

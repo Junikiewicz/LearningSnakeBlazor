@@ -1,0 +1,55 @@
+﻿@page "/neural-network-snake-game-client";
+@using LearningSnake.CurrentConfiguration
+
+<PageTitle>Neural network game - client</PageTitle>
+All the calulations are done on the client side (using WebAssembly). This is your own population. It will perish if you change tab or close browser. Generation number: @_populationIndex
+<GameBoard SnakeGame="_snakeGame" />
+
+@code {
+    private System.Timers.Timer _timer = new System.Timers.Timer(100);
+    private SnakeGame? _snakeGame;
+    private GameSimulator _gameSimulator = new GameSimulator(StaticConfigurationSettings.NeuralNetworkConfiguration, StaticConfigurationSettings.GeneticAlgorithmConfiguration, StaticConfigurationSettings.GameConfiguration);
+    private SnakeSpecimen? _bestSnake;
+    private long _populationIndex = 0;
+
+    protected override Task OnInitializedAsync()
+    {
+        _gameSimulator = new GameSimulator(StaticConfigurationSettings.NeuralNetworkConfiguration, StaticConfigurationSettings.GeneticAlgorithmConfiguration, StaticConfigurationSettings.GameConfiguration);
+        SimulatePopulationAndPickBestSnake();
+
+        _timer.Elapsed += MakeAMove;
+        _timer.AutoReset = true;
+        _timer.Enabled = true;
+
+        return base.OnInitializedAsync();
+    }
+
+    private void SimulatePopulationAndPickBestSnake()
+    {
+        var seed = Guid.NewGuid().GetHashCode();
+
+        _gameSimulator.SimulateGameForEntirePopulation(seed);
+        _bestSnake = _gameSimulator.GetBestSnakeOfCurrentPopulation();
+        _populationIndex++;
+
+        _snakeGame = new SnakeGame(StaticConfigurationSettings.GameConfiguration, seed);
+        _snakeGame.InitializeGame();
+    }
+
+    private void MakeAMove(Object? source, System.Timers.ElapsedEventArgs e)
+    {
+        if (_snakeGame != null && _bestSnake != null && _snakeGame.State == GameState.InProgress)
+        {
+            GameSimulator.MakeMove(_snakeGame, _bestSnake);
+        }
+        else
+        {
+            _timer!.Stop();
+            _gameSimulator.CreateNewGenerationFromPreviousOne();
+            SimulatePopulationAndPickBestSnake();
+            _timer.Start();
+        }
+
+        this.StateHasChanged();
+    }
+}

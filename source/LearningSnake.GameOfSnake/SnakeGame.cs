@@ -6,19 +6,25 @@ namespace LearningSnake.GameOfSnake
 {
     public class SnakeGame
     {
-        private int _snakeLength;
+        private readonly int _maxMoves;
+        private readonly int _snakeMovesGainedAfterEatingFood;
         private readonly Random _random;
         private readonly Queue<Position> _snakeBody;
-        private Direction _lastMove = Direction.Down;
-        private int _movesLeft = 100;
 
-        public SnakeGame(int boardHeight, int boardWidth, int snakeInitialLength, int randomSeed)
+        private Direction _lastMove = Direction.Down;
+        private int _movesLeft;
+        private int _snakeLength;
+
+        public SnakeGame(GameConfiguration gameConfiguration, int randomSeed)
         {
-            BoardSize = new Position { X = boardWidth, Y = boardHeight };
+            BoardSize = new Position { X = gameConfiguration.BoardWidth, Y = gameConfiguration.BoardHeight };
             State = GameState.NotStarted;
 
             _snakeBody = new Queue<Position>();
-            _snakeLength = snakeInitialLength;
+            _snakeLength = gameConfiguration.StartingSnakeLength;
+            _movesLeft = gameConfiguration.SnakeStartingMoves;
+            _maxMoves = gameConfiguration.SnakeMaxMoves;
+            _snakeMovesGainedAfterEatingFood = gameConfiguration.SnakeMovesGainedAfterEatingFood;
             _random = new Random(randomSeed);
         }
 
@@ -36,7 +42,6 @@ namespace LearningSnake.GameOfSnake
                 throw new Exception("It's not possible to restart ongoing or finished game.");
             }
 
-            //TODO: Rewrite generating initial snake body to something more elegant
             var initialSnakeBody = new List<Position>();
             var position = new Position(BoardSize.X / 2, BoardSize.Y / 2);
 
@@ -88,7 +93,11 @@ namespace LearningSnake.GameOfSnake
                     {
                         Score++;
                         _snakeLength++;
-                        _movesLeft += 100;
+                        _movesLeft += _snakeMovesGainedAfterEatingFood;
+
+                        if (_movesLeft > _maxMoves)
+                            _movesLeft = _maxMoves;
+
                         PlaceAppleOnRandomPosition();
                     }
                     _snakeBody.Enqueue(newSnakeHead);

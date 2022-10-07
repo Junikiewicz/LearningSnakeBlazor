@@ -8,7 +8,5 @@
         public int SnakeMovesGainedAfterEatingFood { get; set; }
         public int SnakeMaxMoves { get; set; }
         public int StartingSnakeLength { get; set; }
-        public int SnakeLenghtAdditionAfterEatingFood { get; set; }
-        public bool BinaryVision { get; set; }
     }
 }

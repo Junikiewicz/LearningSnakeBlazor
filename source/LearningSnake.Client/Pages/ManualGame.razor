@@ -1,7 +1,9 @@
 ﻿@page "/manual-snake-game"
+@using LearningSnake.CurrentConfiguration
 
 <PageTitle>Manual snake game</PageTitle>
-<div @ref="testRef" tabindex="0" @onkeydown="HandleKeyDown">
+In order to play you need to have focus on the div below. If you lose it just click it. I will fix it one day.
+<div @ref="testRef" tabindex="0" @onkeydown="HandleKeyDown" class="manual-focus-area">
     <GameBoard SnakeGame="_snakeGame" />
 </div>
 
@@ -10,18 +12,6 @@
     private SnakeGame? _snakeGame;
     private Direction direction = Direction.Down;
     private ElementReference testRef;
-
-    GameConfiguration gameConfiguration = new GameConfiguration
-        {
-            BoardHeight = 10,
-            BoardWidth = 10,
-            SnakeStartingMoves = 100,
-            SnakeMovesGainedAfterEatingFood = 100,
-            SnakeMaxMoves = 500,
-            StartingSnakeLength = 5,
-            SnakeLenghtAdditionAfterEatingFood = 1,
-            BinaryVision = false
-        };
 
     protected override Task OnInitializedAsync()
     {
@@ -52,7 +42,7 @@
     {
         var seed = Guid.NewGuid().GetHashCode();
 
-        _snakeGame = new SnakeGame(gameConfiguration.BoardHeight, gameConfiguration.BoardWidth, gameConfiguration.StartingSnakeLength, seed);
+        _snakeGame = new SnakeGame(StaticConfigurationSettings.GameConfiguration, seed);
         _snakeGame.InitializeGame();
     }
 
