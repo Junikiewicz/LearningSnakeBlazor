@@ -89,21 +89,31 @@ namespace LearningSnake.GameOfSnake
                 {
                     Moves++;
                     _movesLeft--;
-                    if (CheckIfReachedApple(newSnakeHead))
+                    _snakeBody.Enqueue(newSnakeHead);
+
+                    var reachedApple = CheckIfReachedApple(newSnakeHead);
+
+                    if (reachedApple)
                     {
                         Score++;
                         _snakeLength++;
                         _movesLeft += _snakeMovesGainedAfterEatingFood;
 
                         if (_movesLeft > _maxMoves)
+                        {
                             _movesLeft = _maxMoves;
 
-                        PlaceAppleOnRandomPosition();
+                        }
                     }
-                    _snakeBody.Enqueue(newSnakeHead);
+
                     if (_snakeBody.Count() > _snakeLength)
                     {
                         _snakeBody.Dequeue();
+                    }
+
+                    if (reachedApple)
+                    {
+                        PlaceAppleOnRandomPosition();
                     }
                 }
             }
