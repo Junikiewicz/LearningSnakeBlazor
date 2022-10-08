@@ -52,7 +52,7 @@ namespace LearningSnake.LearningSnakeManager
 
         public double CalculateSnakeFitness(SnakeGame game)
         {
-            return game.Moves + Math.Pow(2, game.Score) + Math.Pow(game.Score, 2.1) * 500 - Math.Pow(game.Score, 1.2) * Math.Pow(0.25 * game.Moves, 1.3);
+            return (game.Moves / 16) + Math.Pow(2, game.Score) + Math.Pow(game.Score, 2.1) * 500 - Math.Pow(game.Score, 1.2) * Math.Pow(0.25 * (game.Moves / 16), 1.3);
         }
     }
 }
