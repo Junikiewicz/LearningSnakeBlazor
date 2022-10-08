@@ -12,10 +12,10 @@ All the calulations are done on the server. In this window you only see results.
     <button type="button" class="btn btn-success mt-2" @onclick="@MoveToTheLatestPopulation">Show latest generation</button>
 
 </div>
-<div>
+@*<div>
     <button type="button" class="btn btn-danger mt-2" @onclick="@ResetPopulation">Kill entire population and start from beginning</button>
 </div>
-
+*@
 @code {
     private System.Timers.Timer _timer = new System.Timers.Timer(100);
     private SnakeGame? _snakeGame;
