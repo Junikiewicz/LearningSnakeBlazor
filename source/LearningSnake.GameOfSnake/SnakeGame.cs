@@ -81,19 +81,13 @@ namespace LearningSnake.GameOfSnake
                 {
                     State = GameState.GameOver;
                 }
-                else if (CheckIfVictory())
-                {
-                    State = GameState.Victory;
-                }
                 else
                 {
                     Moves++;
                     _movesLeft--;
                     _snakeBody.Enqueue(newSnakeHead);
 
-                    var reachedApple = CheckIfReachedApple(newSnakeHead);
-
-                    if (reachedApple)
+                    if (CheckIfReachedApple(newSnakeHead))
                     {
                         Score++;
                         _snakeLength++;
@@ -102,18 +96,21 @@ namespace LearningSnake.GameOfSnake
                         if (_movesLeft > _maxMoves)
                         {
                             _movesLeft = _maxMoves;
+                        }
 
+                        if (CheckIfVictory())
+                        {
+                            State = GameState.Victory;
+                        }
+                        else
+                        {
+                            PlaceAppleOnRandomPosition();
                         }
                     }
 
                     if (_snakeBody.Count() > _snakeLength)
                     {
                         _snakeBody.Dequeue();
-                    }
-
-                    if (reachedApple)
-                    {
-                        PlaceAppleOnRandomPosition();
                     }
                 }
             }
