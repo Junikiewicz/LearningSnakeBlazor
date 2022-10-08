@@ -1,5 +1,6 @@
 ﻿@page "/neural-network-snake-game-client";
-@using LearningSnake.CurrentConfiguration
+@using LearningSnake.CurrentConfiguration;
+@implements IDisposable;
 
 <PageTitle>Neural network game - client</PageTitle>
 All the calulations are done on the client side (using WebAssembly). This is your own population. It will perish if you change tab or close browser. Generation number: @_populationIndex
@@ -51,5 +52,10 @@ All the calulations are done on the client side (using WebAssembly). This is you
         }
 
         this.StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
     }
 }

@@ -1,5 +1,6 @@
 ﻿@page "/manual-snake-game"
 @using LearningSnake.CurrentConfiguration
+@implements IDisposable;
 
 <PageTitle>Manual snake game</PageTitle>
 In order to play you need to have focus on the div below. If you lose it just click it. I will fix it one day.
@@ -73,5 +74,10 @@ In order to play you need to have focus on the div below. If you lose it just cl
         {
             await testRef.FocusAsync();
         }
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
     }
 }

@@ -3,6 +3,7 @@
 @using LearningSnake.DTO
 @using System.Text.Json
 @inject HttpClient httpClient;
+@implements IDisposable;
 
 <PageTitle>Neural network game - server</PageTitle>
 All the calulations are done on the server. In this window you only see results. There is only one population for all application users. Generation number: @_populationIndex
@@ -77,5 +78,10 @@ All the calulations are done on the server. In this window you only see results.
         _timer!.Stop();
         await LoadCurrentBestSnake();
         _timer.Start();
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
     }
 }
