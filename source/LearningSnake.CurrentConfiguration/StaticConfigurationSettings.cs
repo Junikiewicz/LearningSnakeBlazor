@@ -18,7 +18,7 @@ namespace LearningSnake.CurrentConfiguration
 
         public static GeneticAlgorithmConfiguration GeneticAlgorithmConfiguration = new GeneticAlgorithmConfiguration
         {
-            PopulationSize = 10000,
+            PopulationSize = 1000,
             MutationRate = 0.01,
             ParentPercentage = 0.05,
             PreservedParents = 0.5
@@ -26,11 +26,11 @@ namespace LearningSnake.CurrentConfiguration
 
         public static GameConfiguration GameConfiguration = new GameConfiguration
         {
-            BoardHeight = 40,
-            BoardWidth = 40,
-            SnakeStartingMoves = 1600,
-            SnakeMovesGainedAfterEatingFood = 1600,
-            SnakeMaxMoves = 2400,
+            BoardHeight = 10,
+            BoardWidth = 10,
+            SnakeStartingMoves = 100,
+            SnakeMovesGainedAfterEatingFood = 100,
+            SnakeMaxMoves = 150,
             StartingSnakeLength = 5,
         };
     }
